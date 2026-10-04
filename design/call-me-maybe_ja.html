@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>call me maybe 和訳</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --surface: #ffffff;
+    --text: #1f2328;
+    --muted: #5b6370;
+    --border: #e3e3dc;
+    --accent: #6b2fa3;
+    --accent-soft: #f3ecfa;
+    --code-bg: #f4f4f0;
+    --info-bg: #eef3ff;
+    --info-border: #4a6fd8;
+    --warn-bg: #fff1f0;
+    --warn-border: #d64545;
+    --good: #1f8a3a;
+    --bad: #c0392b;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, sans-serif;
+    line-height: 1.8;
+    font-size: 16px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 16px 80px; }
+  header.hero {
+    text-align: center;
+    padding: 40px 16px 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  header.hero h1 { font-size: 2.4rem; margin: 0; letter-spacing: .02em; }
+  header.hero .sub { font-size: 1.15rem; color: var(--muted); margin: 4px 0 16px; }
+  header.hero .meta { font-size: .9rem; color: var(--muted); }
+  nav.toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 40px;
+  }
+  nav.toc h2 { margin: 0 0 8px; font-size: 1.1rem; border: none; padding: 0; }
+  nav.toc ol { margin: 0; padding-left: 1.4em; }
+  nav.toc a { color: var(--accent); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  section.chapter {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 24px 12px;
+    margin-bottom: 28px;
+  }
+  .chap-no { color: var(--accent); font-weight: 700; font-size: .9rem; letter-spacing: .08em; }
+  h2 { font-size: 1.6rem; margin: 2px 0 16px; }
+  h3 {
+    font-size: 1.2rem;
+    margin: 28px 0 8px;
+    padding-left: 10px;
+    border-left: 4px solid var(--accent);
+  }
+  h4 { font-size: 1.05rem; margin: 20px 0 6px; }
+  p { margin: 8px 0 12px; }
+  ul, ol { padding-left: 1.4em; }
+  li { margin: 4px 0; }
+  code {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: .9em;
+    word-break: break-word;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    font-size: .85rem;
+    line-height: 1.55;
+  }
+  pre code { background: none; padding: 0; }
+  .callout {
+    border-left: 5px solid;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 16px 0;
+  }
+  .callout.info { background: var(--info-bg); border-color: var(--info-border); }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout strong.label { display: block; font-size: .85rem; margin-bottom: 2px; }
+  .practice { border-left: 4px solid; padding: 6px 12px; margin: 10px 0; background: #fcfcfa; }
+  .practice.good { border-color: var(--good); }
+  .practice.bad { border-color: var(--bad); }
+  .practice .tag { font-weight: 700; font-size: .9rem; }
+  .practice.good .tag { color: var(--good); }
+  .practice.bad .tag { color: var(--bad); }
+  .term { color: var(--muted); font-size: .9em; }
+  .flow {
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    margin: 12px 0; font-size: .9rem;
+  }
+  .flow span.box {
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid #dccbef; border-radius: 6px; padding: 4px 10px; font-weight: 600;
+  }
+  .flow span.arrow { color: var(--muted); }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: .95rem; }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--accent-soft); }
+  .table-wrap { overflow-x: auto; }
+  footer { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 40px; }
+  @media (max-width: 600px) {
+    header.hero h1 { font-size: 1.9rem; }
+    section.chapter { padding: 18px 16px 8px; }
+    h2 { font-size: 1.35rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>call me maybe</h1>
+  <p class="sub">LLM における関数呼び出し（Function Calling）入門</p>
+  <p class="meta">概要：LLM はコンピュータの言葉を話せるのか？ それを確かめよう。<br>
+  @ldevelle, @pcamaren, @crfernan との共同制作 ／ Version 1.5（日本語訳）</p>
+</header>
+
+<nav class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#ch1">はじめに（Foreword）</a></li>
+    <li><a href="#ch2">AI 利用に関する指示</a></li>
+    <li><a href="#ch3">イントロダクション</a></li>
+    <li><a href="#ch4">共通の指示</a></li>
+    <li><a href="#ch5">必須パート</a></li>
+    <li><a href="#ch6">README の要件</a></li>
+    <li><a href="#ch7">ボーナスパート</a></li>
+    <li><a href="#ch8">提出とピアレビュー</a></li>
+  </ol>
+</nav>
+
+<!-- Chapter I -->
+<section class="chapter" id="ch1">
+  <div class="chap-no">CHAPTER I</div>
+  <h2>はじめに</h2>
+  <p>古代ローマの技術者は、帝国中の穀物輸送を記録するために完璧な格子を刻んだ石板を使い、悪筆のせいで荷が失われないようにした。1800年代の船乗りは海流を構造化された表に記録し、その精度はいまでも航海に使われるものがあるほどだった。</p>
+  <p>最初の天気予報は、決まった符号の電報で送られた — 数個の数字で空全体を表せたのだ。1960年代の NASA 管制室では、誰が当番でも点滅するランプの意味が正確に分かるよう、ラミネート加工されたフローチャートを使っていた。スーパーのバーコードスキャナーは、多くの家庭にコンピュータが来るずっと前から白黒の縞を在庫データに変換していた。養蜂家でさえ何十年も標準化された用紙を使い、巣の健康状態や蜜の流れ、女王蜂の系統を、本人だけがひと目で読める小さな枠に記録してきた。</p>
+  <p>人類は常に、情報を<strong>信頼でき、共有でき、使える</strong>ものにするための構造を作ってきた。そして今日、目指すのは <strong>AI にコンピュータの言葉を話させること</strong> だ。</p>
+</section>
+
+<!-- Chapter II -->
+<section class="chapter" id="ch2">
+  <div class="chap-no">CHAPTER II</div>
+  <h2>AI 利用に関する指示</h2>
+
+  <h3>背景</h3>
+  <p>学習の過程で、AI はさまざまな作業を手助けしてくれる。AI ツールの能力や活用法を探る時間をとろう。ただし、常に慎重に向き合い、結果を批判的に評価すること。コードでも、ドキュメントでも、アイデアでも、技術的な説明でも、質問がうまく組み立てられていたか、生成内容が正確かを完全に確信することはできない。仲間（ピア）は、ミスや見落としを防ぐための貴重な存在だ。</p>
+
+  <h3>主なメッセージ</h3>
+  <ul>
+    <li>繰り返しの作業や退屈な作業を減らすために AI を使おう。</li>
+    <li>将来のキャリアに役立つプロンプト力（コーディング・非コーディング両方）を伸ばそう。</li>
+    <li>AI の仕組みを学び、よくあるリスク・バイアス・倫理的問題を予測して避けられるようにしよう。</li>
+    <li>仲間と協力しながら、技術力とヒューマンスキルの両方を伸ばし続けよう。</li>
+    <li>自分が完全に理解し、責任を持てる AI 生成コンテンツだけを使おう。</li>
+  </ul>
+
+  <h3>学習者のルール</h3>
+  <ul>
+    <li>AI ツールを探り、その仕組みを理解する時間をとること。倫理的に使い、バイアスを減らすためだ。</li>
+    <li>プロンプトを書く前に問題をよく考えること。より明確で詳細、的確な語彙のプロンプトが書けるようになる。</li>
+    <li>AI が生成したものは、体系的にチェック・レビュー・疑問視・テストする習慣をつけること。</li>
+    <li>常にピアレビューを求めること。自分だけの確認に頼らないこと。</li>
+  </ul>
+
+  <h3>このフェーズで得られる成果</h3>
+  <ul>
+    <li>汎用的なプロンプト力と、分野特化のプロンプト力の両方を伸ばす。</li>
+    <li>AI ツールを効果的に使い、生産性を上げる。</li>
+    <li>計算論的思考・問題解決力・適応力・協調性を引き続き強化する。</li>
+  </ul>
+
+  <h3>コメントと例</h3>
+  <ul>
+    <li>試験や評価など、本当の理解を示さなければならない場面は何度もある。準備を怠らず、技術力と対人スキルを磨き続けよう。</li>
+    <li>自分の考えを説明したり仲間と議論したりすると、理解の穴が見つかることが多い。ピアラーニングを優先しよう。</li>
+    <li>AI ツールはあなた固有の状況を知らず、一般的な回答をしがちだ。同じ環境にいる仲間の方が、的確な助言をくれることがある。</li>
+    <li>AI は「最もありがちな答え」を出しやすいが、仲間は別の視点や細かなニュアンスをくれる。品質チェックの拠り所にしよう。</li>
+  </ul>
+
+  <div class="practice good"><span class="tag">✓ 良い例</span><br>AI に「ソート関数はどうテストすればいい？」と聞く。いくつかアイデアをもらい、試してみて、結果を仲間とレビューする。一緒にやり方を磨いていく。</div>
+  <div class="practice bad"><span class="tag">✗ 悪い例</span><br>AI に関数まるごと書かせてコピペする。ピア評価で、それが何をするのか・なぜそうなのか説明できない。信用を失い、課題も落ちる。</div>
+  <div class="practice good"><span class="tag">✓ 良い例</span><br>AI にパーサの設計を手伝ってもらう。その後、仲間とロジックを一つずつ確認する。バグを2つ見つけて一緒に書き直す — より良く、きれいで、完全に理解したコードになる。</div>
+  <div class="practice bad"><span class="tag">✗ 悪い例</span><br>プロジェクトの重要部分を Copilot に生成させる。コンパイルは通るが、パイプの扱いを説明できない。評価で根拠を示せず、課題を落とす。</div>
+</section>
+
+<!-- Chapter III -->
+<section class="chapter" id="ch3">
+  <div class="chap-no">CHAPTER III</div>
+  <h2>イントロダクション</h2>
+
+  <h3>III.1 Function Calling（関数呼び出し）とは？</h3>
+  <p>大規模言語モデル（LLM <span class="term">＝ChatGPT のような文章を作る AI</span>）は人間の言葉を理解・生成するのは得意だが、構造化された、機械がそのまま実行できる出力を自然には作れない。Function Calling は、自然言語のリクエストを<strong>型付きの引数を持つ正確な関数呼び出し</strong>に翻訳することで、このギャップを埋める。</p>
+  <p>例：自然言語 → 関数呼び出し</p>
+<pre><code>User: "What is the sum of 40 and 2?"
+
+Traditional LLM: "The sum of 40 and 2 is 42."
+
+Function Calling System:
+{
+  "function": "add_numbers",
+  "arguments": {"a": 40, "b": 2}
+}</code></pre>
+  <p>Function Calling システムは質問に直接答えるのではない。代わりに、それを解くための<strong>道具</strong> — 正しい関数名と、正しい型の引数 — を提供するのだ。</p>
+
+  <h3>III.2 なぜ重要なのか？</h3>
+  <p>Function Calling によって LLM は次のことができるようになる：</p>
+  <ul>
+    <li><strong>外部システムとの連携</strong>：API を呼ぶ、データベースに問い合わせる、デバイスを制御する</li>
+    <li><strong>コードの実行</strong>：計算、データ変換、ファイル操作</li>
+    <li><strong>操作の連鎖</strong>：複雑なタスクを実行可能なステップに分解する</li>
+    <li><strong>構造化された出力</strong>：JSON や XML など機械が読める形式を生成する</li>
+    <li><strong>非構造テキストからの構造化データ抽出</strong>：例えば長い本から <code>{主人公の名前, 主人公の性別, 主人公の年齢}</code> のような項目を抜き出す</li>
+  </ul>
+  <p>この技術は現代の AI アシスタント、コード生成ツール、自律エージェントを支えており、生テキストからの自動情報抽出や知識の構造化も可能にしている。</p>
+
+  <h3>III.3 課題</h3>
+  <p>小さな言語モデル（今回使う 0.6B <span class="term">＝6億パラメータ</span> のモデルなど）は、構造化された出力を生成するのが苦手なことで知られている。JSON を出せと指示しても、成功するのは 30% 程度かもしれない。それでも実運用のシステムは、同じ小さなモデルで 99% 以上の信頼性を達成している。</p>
+  <p><strong>どうやって？</strong> その答えが <strong>Constrained Decoding（制約付きデコーディング）</strong> だ。プロンプトだけに頼らず、モデルの出力をトークン <span class="term">（＝単語のかけら）</span> 単位で誘導し、正しい構造を保証する技術である。</p>
+</section>
+
+<!-- Chapter IV -->
+<section class="chapter" id="ch4">
+  <div class="chap-no">CHAPTER IV</div>
+  <h2>共通の指示</h2>
+
+  <h3>IV.1 一般ルール</h3>
+  <ul>
+    <li>プロジェクトは <strong>Python 3.10 以上</strong>で書くこと。</li>
+    <li><strong>flake8</strong> のコーディング規約に従うこと。</li>
+    <li>関数は例外を適切に処理し、クラッシュを避けること。<code>try-except</code> で起こりうるエラーを扱い、ファイルや接続などのリソースにはコンテキストマネージャ <span class="term">（＝<code>with</code> 文）</span> を使って自動で後片付けされるようにすること。レビュー中に未処理の例外でクラッシュした場合、動作しないものとみなされる。</li>
+    <li>すべてのリソース（ファイルハンドル、ネットワーク接続など）はリークしないよう適切に管理すること。可能な限りコンテキストマネージャを使うこと。</li>
+    <li>関数の引数・戻り値・変数（必要な場合）に型ヒントをつけること（<code>typing</code> モジュールを使用）。静的型チェックには <code>mypy</code> を使い、すべての関数が mypy をエラーなしで通ること。</li>
+    <li>関数とクラスには PEP 257 に従った docstring（Google スタイルや NumPy スタイルなど）を書き、目的・引数・戻り値を記述すること。</li>
+  </ul>
+
+  <h3>IV.2 Makefile</h3>
+  <p>よく使う作業を自動化する <code>Makefile</code> を用意すること。以下のルールを含めること（lint は指定のフラグ必須。より厳しいチェックとして <code>--strict</code> を試すことを強く推奨）：</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>ルール</th><th>内容</th></tr>
+    <tr><td><code>install</code></td><td>pip / uv / pipx など好きなパッケージマネージャで依存関係をインストール</td></tr>
+    <tr><td><code>run</code></td><td>メインスクリプトを実行（例：Python インタプリタ経由）</td></tr>
+    <tr><td><code>debug</code></td><td>Python 組み込みのデバッガ（pdb など）でメインスクリプトをデバッグモード実行</td></tr>
+    <tr><td><code>clean</code></td><td><code>__pycache__</code> や <code>.mypy_cache</code> などの一時ファイル・キャッシュを削除</td></tr>
+    <tr><td><code>lint</code></td><td><code>flake8 .</code> と <code>mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs</code> を実行</td></tr>
+    <tr><td><code>lint-strict</code>（任意）</td><td><code>flake8 .</code> と <code>mypy . --strict</code> を実行</td></tr>
+  </table>
+  </div>
+
+  <h3>IV.3 追加ガイドライン</h3>
+  <ul>
+    <li>動作確認用のテストプログラムを作ること（提出・採点対象外）。<code>pytest</code> や <code>unittest</code> を使い、エッジケースもカバーすること。</li>
+    <li>Python の生成物を除外する <code>.gitignore</code> を含めること。</li>
+    <li>開発中の依存関係の分離には仮想環境（venv や conda など）の使用を推奨。</li>
+  </ul>
+  <p><em>プロジェクト固有の追加要件がある場合は、このすぐ下に記載される。</em></p>
+
+  <h4>IV.3.1 追加要件</h4>
+  <ul>
+    <li>すべてのクラスはバリデーション（値のチェック）に <strong>pydantic</strong> を使うこと。</li>
+    <li><strong>numpy</strong> と <strong>json</strong> パッケージは使用可。</li>
+    <li><strong>dspy</strong>（およびそれに類するパッケージ）の使用は完全禁止。pytorch、huggingface 系パッケージ、transformers、outlines なども含む。</li>
+    <li>使用するモデル：
+      <ul>
+        <li><strong>Qwen/Qwen3-0.6B</strong>（デフォルト）</li>
+        <li>他のモデルを使ってもよいが、<strong>Qwen/Qwen3-0.6B</strong> で動作することが条件。</li>
+      </ul>
+    </li>
+    <li>呼び出す関数は <strong>LLM で選ぶこと</strong>。ヒューリスティック（決め打ちのルール）や「中世の魔術」のようなものは不可。</li>
+    <li><code>llm_sdk</code> パッケージのプライベートなメソッド・属性（<code>_</code> で始まるもの）の使用は禁止。</li>
+    <li>仮想環境を作り、<strong>uv</strong> で <strong>numpy</strong> と <strong>pydantic</strong> をインストールすること。<strong>llm_sdk</strong> は <code>src</code> と同じ階層にコピーして使ってよい。</li>
+    <li>レビュアーも moulinette（自動採点）も <code>uv sync</code> を実行するだけである。</li>
+    <li>すべてのエラーは適切に処理すること。プログラムは決して予期せずクラッシュしてはならず、常にユーザーに分かりやすいエラーメッセージを出すこと。</li>
+  </ul>
+
+  <h4>IV.3.2 使い方</h4>
+  <p>プログラムは次のコマンドで実行できなければならない（<code>src</code> はファイルを置くフォルダ）：</p>
+<pre><code>uv run python -m src [--functions_definition &lt;function_definition_file&gt;] [--input &lt;input_file&gt;] [--output &lt;output_file&gt;]</code></pre>
+  <div class="callout info"><strong class="label">ℹ 情報</strong>デフォルトでは <code>data/input/</code> から入力ファイルを読み、<code>data/output/</code> に出力を書く。<code>--input</code> や <code>--output</code> で任意のパスを指定することもできる。例：</div>
+<pre><code>uv run python -m src
+--functions_definition data/input/functions_definition.json
+--input data/input/function_calling_tests.json
+--output data/output/function_calls.json</code></pre>
+</section>
+
+<!-- Chapter V -->
+<section class="chapter" id="ch5">
+  <div class="chap-no">CHAPTER V</div>
+  <h2>必須パート</h2>
+
+  <h3>V.1 概要</h3>
+  <p>このプロジェクトでは、自然言語のプロンプトを構造化された関数呼び出しに変換するツールを作る。「What is the sum of 40 and 2?」という質問に対して、42 を返すのではなく、次を出力する：</p>
+  <ul>
+    <li>関数名：<code>fn_add_numbers</code></li>
+    <li>引数：<code>{"a": 40, "b": 2}</code></li>
+  </ul>
+  <p>実装では <strong>Constrained Decoding</strong> を使い、<strong>100% 有効な JSON</strong> を保証すること。それにより 0.6B パラメータの小さなモデルでも、ほぼ完璧な信頼性を実現する。</p>
+
+  <h3>V.2 入力ファイル</h3>
+  <p><code>data/input/</code> にある 2 つの入力ファイルを処理する：</p>
+  <h4><code>function_calling_tests.json</code></h4>
+  <p>システムが処理すべき自然言語プロンプトの JSON 配列。</p>
+<pre><code>[
+  { "prompt": "What is the sum of 2 and 3?" },
+  { "prompt": "What is the sum of 265 and 345?" },
+  { "prompt": "Greet shrek" },
+  { "prompt": "Greet john" },
+  { "prompt": "Reverse the string 'hello'" },
+  ...
+]</code></pre>
+  <h4><code>functions_definition.json</code></h4>
+  <p>システムが呼び出せる関数の一覧。各関数は次を含む：関数名／引数の名前と型／戻り値の型／説明</p>
+<pre><code>[
+  {
+    "name": "fn_add_numbers",
+    "description": "Add two numbers together and return their sum.",
+    "parameters": {
+      "a": { "type": "number" },
+      "b": { "type": "number" }
+    },
+    "returns": { "type": "number" }
+  },
+  {
+    "name": "fn_greet",
+    "description": "Generate a greeting message for a person by name.",
+    "parameters": {
+      "name": { "type": "string" }
+    },
+    "returns": { "type": "string" }
+  },
+  {
+    "name": "fn_reverse_string",
+    "description": "Reverse a string and return the reversed result.",
+    "parameters": {
+      "s": { "type": "string" }
+    },
+    "returns": { "type": "string" }
+  },
+  ...
+]</code></pre>
+  <div class="callout warn"><strong class="label">⚠ 注意</strong>これらの例は想定される難易度の目安である。実際には別のプロンプトや関数セットでテストされる。入力ファイルが不正な JSON だったり存在しなかったりする可能性があるので、適切な JSON エラー処理を実装すること。</div>
+
+  <h3>V.3 LLM とのやりとり</h3>
+  <h4>V.3.1 LLM SDK</h4>
+  <p>このプロジェクトには、LLM を操作するためのラッパークラス <strong>Small_LLM_Model</strong> が <code>llm_sdk</code> パッケージ内に付属している。主なメソッドは以下：</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>メソッド</th><th>説明</th></tr>
+    <tr><td><code>get_logits_from_input_ids(input_ids: List[int]) -&gt; List[float]</code></td><td>トークン ID のリストを受け取り、LLM が出力したロジット <span class="term">（＝次の各トークンの「ありえそう度」スコア）</span> を返す。</td></tr>
+    <tr><td><code>get_path_to_vocab_file() -&gt; str</code></td><td>トークン ID とトークンの対応表（語彙ファイル）のパスを返す。</td></tr>
+    <tr><td><code>encode(text: str) -&gt; Tensor</code></td><td>モデルのトークナイザで文字列をトークン ID のテンソル <span class="term">（＝数値の配列）</span> に変換する。</td></tr>
+    <tr><td><code>decode(token_ids: List[int]) -&gt; str</code>（任意）</td><td>トークン ID のリストを文字列に戻す。</td></tr>
+  </table>
+  </div>
+
+  <h4>V.3.2 生成パイプライン</h4>
+  <p>LLM の生成は次の手順で進む：</p>
+  <ol>
+    <li><strong>プロンプト</strong>：自然言語の質問。例：<em>"What is the sum of 2 and 3?"</em></li>
+    <li><strong>トークン化</strong>：テキストをサブワード単位（トークン）に分割する。単純な単語分割と違い、トークナイザは先頭の空白を含めたり、句読点を扱ったり、BPE や SentencePiece などのアルゴリズムで単語をさらに細かく分けたりする。<br>例（実際に近いもの）：<code>["What", "Ġis", "Ġthe", "Ġsum", "Ġof", "Ġ2", "Ġand", "Ġ3", "?"]</code><br>※ 記号 <code>Ġ</code> は直前に空白があることを表す。実際のトークナイザは、テキストを正確に復元するためにこうした細部を保持している。</li>
+    <li><strong>入力 ID</strong>：トークンをモデルが理解できる数値 ID に変換する。例（説明用）：<code>[892, 318, 262, 4771, 286, 16, 290, 17, 30]</code></li>
+    <li><strong>LLM 処理</strong>：モデルがニューラルネットワークでこれらの数値を処理する。</li>
+    <li><strong>ロジット</strong>：モデルが、次に来うる各トークンの確率スコアを出力する。例：<code>token_5: 0.001, token_42: 0.85, token_100: 0.02, ...</code></li>
+    <li><strong>トークン選択</strong>：確率をもとに次のトークンを選ぶ（通常は最もスコアの高いもの）。<br><em>この段階で <strong>Constrained Decoding</strong> のような技術を適用し、選べるトークンを制限して、100% 有効な JSON のような特定の構造に従わせることができる。</em></li>
+  </ol>
+  <p><strong>重要</strong>：この処理はトークン 1 つずつ繰り返される。生成されたトークンはプロンプトに追加され、応答が完成するまで手順 2〜6 を繰り返す。</p>
+  <p><strong>簡略図：</strong></p>
+  <div class="flow">
+    <span class="box">Prompt</span><span class="arrow">→</span>
+    <span class="box">Tokenization</span><span class="arrow">→</span>
+    <span class="box">Input IDs</span><span class="arrow">→</span>
+    <span class="box">LLM</span><span class="arrow">→</span>
+    <span class="box">Logits</span><span class="arrow">→</span>
+    <span class="box">Next Token Selection</span>
+  </div>
+
+  <h4>V.3.3 Constrained Decoding を理解する</h4>
+  <p>言語モデルはテキストを 1 トークンずつ生成する。各ステップで、モデルは次に来うる全トークンの確率分布（ロジット）を出す。通常は、この分布からサンプリングするか、最も確率の高いトークンを選ぶ。</p>
+  <p><strong>Constrained Decoding</strong> は、トークンを選ぶ<em>前に</em>ロジットを書き換えることでこの過程に介入する：</p>
+  <ol>
+    <li>モデルが全トークンのロジットを出す。</li>
+    <li>有効な JSON 構造<em>かつ想定スキーマ <span class="term">（＝データの形のルール）</span> に適合する</em>トークンがどれかを判定する。</li>
+    <li>無効なトークン（スキーマや構造を壊すもの）のロジットを負の無限大にする。</li>
+    <li>残った有効なトークンの中からだけ選ぶ。</li>
+  </ol>
+  <p>このプロジェクトでは、Constrained Decoding は構文的に正しい JSON を保証するだけでなく、特定のスキーマも強制しなければならない。例えば <code>functions_definition.json</code> でフィールドが number と定められていれば、デコーダは整数または小数を満たす値だけを選ばせ、JSON としての正しさとスキーマ適合の両方を保つ。これにより、生成されるすべてのトークンが構造的にも意味的にも正しくなり、出力 JSON は 100% 取り出せて、必ずエラーなくパースできる。</p>
+  <div class="callout warn"><strong class="label">⚠ 注意</strong>モデルがプロンプトから自発的に正しい JSON を出すことに頼っては<strong>いけない</strong>。関数定義をプロンプトに入れて構造化出力を期待するのは信頼性がなく、ここで身につけてほしいスキルでもない。</div>
+  <div class="callout info"><strong class="label">ℹ ヒント</strong>語彙 JSON ファイルを使って、トークンとその文字列表現をどう対応づけられるか考えてみよう。これは各生成ステップでどのトークンが有効かを判断するうえで非常に重要だ。</div>
+
+  <h3>V.4 出力ファイル形式</h3>
+  <p>プログラムは 1 つの JSON ファイル <code>data/output/function_calling_results.json</code> を出力する。プロンプトごとに JSON オブジェクトを 1 つ追加し、各オブジェクトは<strong>ちょうど</strong>次のキーを持つこと：</p>
+  <ul>
+    <li><code>prompt</code>（文字列）：元の自然言語リクエスト</li>
+    <li><code>name</code>（文字列）：呼び出す関数の名前</li>
+    <li><code>parameters</code>（オブジェクト）：必要な引数すべてを正しい型で</li>
+  </ul>
+  <h4>V.4.1 出力例</h4>
+<pre><code>[
+    {
+        "prompt": "What is the sum of 2 and 3?",
+        "name": "fn_add_numbers",
+        "parameters": {"a": 2.0, "b": 3.0}
+    },
+    {
+        "prompt": "Reverse the string 'hello'",
+        "name": "fn_reverse_string",
+        "parameters": {"s": "hello"}
+    }
+]</code></pre>
+  <h4>V.4.2 検証ルール</h4>
+  <ul>
+    <li>ファイルは有効な JSON であること（末尾カンマなし、コメントなし）</li>
+    <li>キーと型は <code>functions_definition.json</code> のスキーマに完全一致すること</li>
+    <li>出力のどこにも余計なキーや文章を含めないこと</li>
+    <li>必須の引数はすべて含めること</li>
+    <li>引数の型は関数定義（number、string、boolean など）と一致すること</li>
+  </ul>
+  <div class="callout warn"><strong class="label">⚠ 注意</strong>入力ファイルはピアレビュー中に変更される可能性がある。提供された例をもとに答えをハードコードしないこと。</div>
+
+  <h3>V.5 性能と信頼性</h3>
+  <p>実装は次を達成すること：</p>
+  <ul>
+    <li><strong>ほぼ完璧な精度</strong>：関数の選択と引数の抽出が 90% 以上正しい</li>
+    <li><strong>100% 有効な JSON</strong>：すべての出力がパース可能かつスキーマ準拠</li>
+    <li><strong>妥当な速度</strong>：一般的なハードウェアで全テストプロンプトを 5 分以内に処理</li>
+    <li><strong>堅牢なエラー処理</strong>：不正な入力、ファイルの欠如、エッジケースを適切に処理</li>
+  </ul>
+  <div class="callout info"><strong class="label">ℹ 情報</strong>Qwen3-0.6B はわずか 5 億パラメータしかないが、適切な Constrained Decoding を使えば、はるかに大きなモデルに匹敵する信頼性を出せる。これは、モデルの大きさよりも構造による誘導の力を示している。</div>
+
+  <h3>V.6 実装のテスト</h3>
+  <ol>
+    <li>入力ファイルが <code>data/input/</code> にあることを確認する</li>
+    <li>実行：<code>uv run python -m src [-functions_definition &lt;function_definition_file&gt;] [-input &lt;input_file&gt;] [-output &lt;output_file&gt;]</code></li>
+    <li><code>output/function_calling_results.json</code> が作られたか確認する</li>
+    <li>JSON の構造と内容を検証する</li>
+    <li>関数名と引数の型が定義と一致するか確認する</li>
+  </ol>
+  <div class="callout warn"><strong class="label">⚠ 注意</strong>さまざまなエッジケースでテストすること：空文字列、大きな数値、特殊文字、間違った型、曖昧なプロンプト、複数の引数を持つ関数など。</div>
+</section>
+
+<!-- Chapter VI -->
+<section class="chapter" id="ch6">
+  <div class="chap-no">CHAPTER VI</div>
+  <h2>README の要件</h2>
+  <p>Git リポジトリのルートに <code>README.md</code> を用意すること。目的は、プロジェクトを知らない人（仲間、スタッフ、採用担当者など）が、何のプロジェクトか・どう動かすか・どこで詳しい情報が得られるかをすぐ理解できるようにすることだ。</p>
+  <p><code>README.md</code> には最低限、次を含めること：</p>
+  <ul>
+    <li><strong>1 行目</strong>は斜体で次の文にすること：<em>This project has been created as part of the 42 curriculum by &lt;login1&gt;[, &lt;login2&gt;[, &lt;login3&gt;[...]]].</em></li>
+    <li><strong>「Description」</strong>セクション：目的と簡単な概要を含め、プロジェクトを明確に紹介する。</li>
+    <li><strong>「Instructions」</strong>セクション：コンパイル・インストール・実行に関する情報。</li>
+    <li><strong>「Resources」</strong>セクション：テーマに関する定番の参考資料（ドキュメント、記事、チュートリアルなど）と、<strong>AI をどう使ったか</strong>（どの作業・どの部分に使ったか）の説明。</li>
+    <li>プロジェクトによっては追加セクションが必要（使用例、機能一覧、技術的な選択など）。</li>
+  </ul>
+  <p>このプロジェクトでは、<code>README.md</code> に以下も含めること：</p>
+  <ul>
+    <li><strong>アルゴリズムの説明</strong>：Constrained Decoding のアプローチを詳しく説明する</li>
+    <li><strong>設計上の判断</strong>：実装における主要な選択を説明する</li>
+    <li><strong>性能分析</strong>：精度・速度・信頼性について論じる</li>
+    <li><strong>直面した課題</strong>：困難とその解決方法を記録する</li>
+    <li><strong>テスト戦略</strong>：実装をどう検証したかを説明する</li>
+    <li><strong>使用例</strong>：プログラムの実行例を分かりやすく示す</li>
+  </ul>
+  <div class="callout info"><strong class="label">ℹ 情報</strong>README は<strong>英語</strong>で書くこと。</div>
+</section>
+
+<!-- Chapter VII -->
+<section class="chapter" id="ch7">
+  <div class="chap-no">CHAPTER VII</div>
+  <h2>ボーナスパート</h2>
+  <p>ボーナス機能（任意。合格には不要）：</p>
+  <ul>
+    <li>Qwen/Qwen3-0.6B 以外の複数の LLM モデルへの対応</li>
+    <li>トークナイザの再実装：メインコードで <code>encode</code> と <code>decode</code> を直接使わず、<code>get_logits_from_input_ids</code> と <code>get_path_to_vocab_file</code> を使う</li>
+    <li>高度なエラー回復の仕組み</li>
+    <li>パフォーマンス最適化（キャッシュ、バッチ処理）</li>
+    <li>包括的なテストスイート</li>
+    <li>生成過程の可視化</li>
+    <li>入れ子になった複雑な関数引数への対応</li>
+    <li>トークナイザの <code>encode</code>（と任意で <code>decode</code>）メソッドの公開実装</li>
+    <li>エンコード・デコードが Constrained Decoding とどう統合されるかのデモ</li>
+  </ul>
+  <p>ボーナス機能は README に書くだけでなく、<strong>実装されて動作する</strong>必要がある。評価中にデモを求められることもある。</p>
+</section>
+
+<!-- Chapter VIII -->
+<section class="chapter" id="ch8">
+  <div class="chap-no">CHAPTER VIII</div>
+  <h2>提出とピアレビュー</h2>
+  <p>いつも通り、課題は <code>Git</code> リポジトリに提出すること。ディフェンス（評価）ではリポジトリ内の作業だけがレビューされる。ファイル名が正しいか、ためらわず再確認しよう。</p>
+  <p>リポジトリには次を含めること：</p>
+  <ul>
+    <li><code>src/</code> ディレクトリ（実装）</li>
+    <li>依存関係管理のための <code>pyproject.toml</code> と <code>uv.lock</code></li>
+    <li><code>llm_sdk/</code> ディレクトリ（提供パッケージからコピー）</li>
+    <li><code>data/input/</code> ディレクトリとテストファイル（デモ用）</li>
+    <li>充実したドキュメントの <code>README.md</code></li>
+    <li>その他、実行に必要なファイル</li>
+  </ul>
+  <div class="callout warn"><strong class="label">⚠ 注意</strong><code>output/</code> ディレクトリはリポジトリに含めないこと。ピアレビュー中に生成される。</div>
+  <p>評価中に、ときどき<strong>プロジェクトの小さな修正</strong>を求められることがある。ちょっとした挙動の変更、数行のコードの追加・書き直し、簡単に追加できる機能などだ。</p>
+  <p>このステップは<strong>すべてのプロジェクトに当てはまるわけではない</strong>が、評価ガイドラインに記載されている場合は備えておく必要がある。</p>
+  <p>このステップの目的は、プロジェクトの特定部分を本当に理解しているかを確かめることだ。修正は好きな開発環境（普段の環境など）で行ってよく、数分で終わる程度の内容である — 評価で特定の制限時間が定められていない限り。</p>
+  <p>例えば、関数やスクリプトの小さな更新、表示の変更、新しい情報を保存するためのデータ構造の調整などを求められるかもしれない。</p>
+  <p>詳細（範囲、対象など）は<strong>評価ガイドライン</strong>で指定され、同じプロジェクトでも評価ごとに異なる場合がある。</p>
+</section>
+
+<footer>原文：call me maybe — Introduction to function calling in LLMs（Version 1.5）の日本語訳</footer>
+
+</div>
+</body>
+</html>

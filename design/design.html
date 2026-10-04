@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>設計書（やさしい版）: call me maybe</title>
+<style>
+:root{
+  --bg:#f8fafc; --panel:#ffffff; --fg:#1e293b; --muted:#64748b;
+  --border:#e2e8f0; --accent:#6d28d9; --accent-soft:#ede9fe;
+  --code-bg:#f1f5f9;
+  --tip-bg:#1e293b; --tip-fg:#f1f5f9;
+  --shadow:0 1px 3px rgba(15,23,42,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f172a; --panel:#1e293b; --fg:#e2e8f0; --muted:#94a3b8;
+    --border:#334155; --accent:#a78bfa; --accent-soft:#4c1d95;
+    --code-bg:#0b1220;
+    --shadow:0 1px 3px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f172a; --panel:#1e293b; --fg:#e2e8f0; --muted:#94a3b8;
+  --border:#334155; --accent:#a78bfa; --accent-soft:#4c1d95;
+  --code-bg:#0b1220;
+  --shadow:0 1px 3px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+body{margin:0;font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic UI",system-ui,sans-serif;
+  background:var(--bg);color:var(--fg);line-height:1.9;font-size:15.5px}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1100px;margin:0 auto;gap:0 40px;padding:0 24px}
+main{padding:28px 0 90px;min-width:0}
+/* ---- 目次 ---- */
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 8px 28px 0;font-size:13px}
+nav.toc .toc-title{font-weight:700;color:var(--muted);font-size:11px;letter-spacing:.06em;margin-bottom:10px}
+nav.toc ol{list-style:none;margin:0;padding:0}
+nav.toc li{margin:2px 0}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:5px 10px;border-left:2px solid var(--border)}
+nav.toc a:hover{color:var(--fg)}
+nav.toc a.active{color:var(--accent);border-left-color:var(--accent);font-weight:600;background:linear-gradient(90deg,var(--accent-soft),transparent)}
+@media (max-width:900px){
+  .layout{display:block}
+  nav.toc{position:static;height:auto;border-bottom:1px solid var(--border);margin-bottom:8px}
+}
+/* ---- ヘッダ・案内 ---- */
+.doc-head h1{font-size:25px;margin:0 0 4px}
+.doc-head h1 .accent{color:var(--accent)}
+.meta{font-size:13px;color:var(--muted)}
+.meta span+span::before{content:"･";margin:0 8px;color:var(--border)}
+.guide{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin:18px 0 0;box-shadow:var(--shadow)}
+.guide .g-title{font-weight:700;font-size:14px;margin-bottom:6px}
+.guide table{border-collapse:collapse;font-size:13.5px}
+.guide td{padding:3px 0;vertical-align:top}
+.guide td:first-child{color:var(--muted);padding-right:16px;white-space:nowrap}
+.guide a{color:var(--accent);text-decoration:none}
+.guide a:hover{text-decoration:underline}
+/* ---- 見出し・本文 ---- */
+section{margin-top:48px}
+h2{font-size:20px;margin:0 0 14px;padding:6px 0 6px 14px;border-left:4px solid var(--accent)}
+p{margin:10px 0}
+ul.plain{padding-left:22px;margin:8px 0}
+ul.plain li{margin:7px 0}
+ol.steps{padding-left:24px;margin:8px 0}
+ol.steps li{margin:9px 0}
+b{font-weight:700}
+code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--code-bg);
+  padding:1px 6px;border-radius:5px;border:1px solid var(--border)}
+.callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;
+  padding:11px 16px;margin:14px 0;font-size:14px;box-shadow:var(--shadow)}
+.idea{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:13px 18px;margin:12px 0;box-shadow:var(--shadow)}
+.idea .i-title{font-weight:700;color:var(--accent);font-size:14.5px;margin-bottom:4px}
+/* ---- 用語（ホバー解説） ---- */
+.term{border-bottom:1.5px dotted var(--accent);cursor:help}
+.tip{position:absolute;display:none;max-width:340px;background:var(--tip-bg);color:var(--tip-fg);
+  padding:9px 13px;border-radius:9px;font-size:12.5px;line-height:1.7;z-index:60;
+  box-shadow:0 6px 20px rgba(0,0,0,.35);pointer-events:none}
+/* ---- 用語集 ---- */
+dl.glossary{margin:8px 0}
+dl.glossary dt{font-weight:700;color:var(--accent);margin-top:14px}
+dl.glossary dd{margin:2px 0 0 0;font-size:14px}
+/* ---- ゴールのチェックリスト ---- */
+.dod-head{display:flex;align-items:center;gap:14px;margin:14px 0 6px;flex-wrap:wrap}
+.dod-count{font:700 13px ui-monospace,monospace;color:var(--accent)}
+.dod-progress{flex:1;max-width:240px;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.dod-bar{height:100%;width:0;background:var(--accent);border-radius:4px;transition:width .3s}
+.dod-note{font-size:11.5px;color:var(--muted)}
+ul.dod{list-style:none;padding:0;margin:8px 0}
+ul.dod li{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border:1px solid var(--border);
+  border-radius:10px;margin:8px 0;background:var(--panel);box-shadow:var(--shadow)}
+ul.dod input{margin-top:6px;accent-color:var(--accent);width:15px;height:15px;flex:none;cursor:pointer}
+ul.dod li.done label{color:var(--muted);text-decoration:line-through}
+ul.dod label{cursor:pointer}
+/* ---- 図 ---- */
+figure.diagram{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--panel);
+  margin:14px 0;overflow-x:auto;box-shadow:var(--shadow)}
+figure.diagram figcaption{font-size:12px;color:var(--muted);margin-top:10px;text-align:center}
+.d-flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin:10px 0}
+.d-step{border:1.5px solid var(--accent);border-radius:10px;padding:8px 14px;background:var(--accent-soft);
+  font-size:13.5px;text-align:center;max-width:190px;display:flex;flex-direction:column;justify-content:center}
+.d-step .d-num{display:inline-block;font:700 11px/1.8 ui-monospace,monospace;color:var(--accent);margin-bottom:2px}
+.d-step .d-cap{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:3px}
+.d-step.plain{border-color:var(--border);background:var(--code-bg)}
+.d-arr{color:var(--muted);align-self:center;font-size:18px;flex:none}
+footer{margin-top:60px;padding-top:14px;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted)}
+#theme-toggle{position:fixed;top:14px;right:16px;z-index:70;border:1px solid var(--border);
+  background:var(--panel);color:var(--fg);border-radius:50%;width:38px;height:38px;
+  cursor:pointer;font-size:17px;box-shadow:var(--shadow)}
+@media print{
+  nav.toc,#theme-toggle,.tip,.dod-note{display:none!important}
+  .layout{display:block;max-width:none;padding:0}
+  body{background:#fff;color:#000;font-size:10.5pt}
+  main{padding:0}
+  figure.diagram,.idea,ul.dod li,.callout{box-shadow:none;break-inside:avoid}
+  section{margin-top:24px}
+  h2{break-after:avoid}
+  .term{border-bottom:none}
+}
+</style>
+</head>
+<body>
+<button id="theme-toggle" title="ダーク/ライト切替" aria-label="テーマ切替">◐</button>
+<div class="layout">
+<nav class="toc" aria-label="目次">
+  <div class="toc-title">目次</div>
+  <ol>
+    <li><a href="#sec-1">1. ひとことで言うと</a></li>
+    <li><a href="#sec-2">2. 全体の流れ</a></li>
+    <li><a href="#sec-3">3. ゴール（完成の条件）</a></li>
+    <li><a href="#sec-4">4. どう作る？</a></li>
+    <li><a href="#sec-5">5. どう確かめる？</a></li>
+    <li><a href="#sec-6">6. 作る順番</a></li>
+    <li><a href="#sec-7">7. つまずきやすいポイント</a></li>
+    <li><a href="#sec-8">8. 用語集</a></li>
+  </ol>
+</nav>
+<main>
+
+<header class="doc-head">
+  <h1>設計書（やさしい版）: <span class="accent">call me maybe</span></h1>
+  <div class="meta">
+    <span>Subject: en.call-me-maybe.pdf (v1.5)</span>
+    <span>作成者: kamurai</span>
+    <span>最終更新: 2026-07-30</span>
+  </div>
+  <div class="guide">
+    <div class="g-title">📖 読み方ガイド</div>
+    <table>
+      <tr><td>3分でざっくり知りたい</td><td><a href="#sec-1">1章</a>と<a href="#sec-2">2章</a>だけ読めばOK</td></tr>
+      <tr><td>課題の中身を理解したい</td><td><a href="#sec-1">1章</a>〜<a href="#sec-3">3章</a></td></tr>
+      <tr><td>作り方を知りたい</td><td><a href="#sec-4">4章</a>（迷ったら<a href="#sec-8">用語集</a>へ）</td></tr>
+      <tr><td>これから開発を始める</td><td><a href="#sec-6">6章</a>と<a href="#sec-7">7章</a></td></tr>
+    </table>
+    <div style="font-size:12px;color:var(--muted);margin-top:8px">💡 点線つきの<span class="term" data-tip="こんなふうに、マウスを乗せるとやさしい解説が出ます。">専門用語</span>はマウスを乗せると解説が出ます。</div>
+  </div>
+</header>
+
+<!-- ==================== 1 ==================== -->
+<section id="sec-1">
+<h2>🔰 1. ひとことで言うと</h2>
+<p><b>「人間の自由な言葉のお願いを、プログラムが確実に実行できる注文票（<span class="term" data-tip="波かっこ { } や引用符で書く、プログラム同士のデータ受け渡しの定番書式。書き方のルールが厳密に決まっている。">JSON</span>）に変換するツール」</b>です。ターミナルから動かす<span class="term" data-tip="ターミナルに文字でコマンドを打って動かすプログラムの形。マウスで操作する画面は持たない。">CLI</span>プログラムとして作ります。</p>
+<p>レストランを想像してください。お客さんは「えーと、パスタで、辛くないやつをひとつ」と、どんな言い方で注文してもかまいません。でも厨房に届く伝票は、必ず決まった書式で書かれています。この「自由な言葉 → 決まった書式の伝票」の変換を、AI（小型の<span class="term" data-tip="大規模言語モデル。大量の文章から「次に来る言葉」を予測することを学んだAI。この課題では小型の Qwen3-0.6B を使う。">LLM</span>: Qwen3-0.6B）に書かせるのがこの課題です。</p>
+<p>ただし、AIは放っておくと伝票の書式を平気で間違えます。そこで<b>「今この瞬間に書いてよい文字」以外を物理的に選べなくするガードレール</b>（<span class="term" data-tip="ルールに合わないトークンを選べないようにしながらAIに文章を作らせる方法。お願いではなく仕組みで、出力が必ずルールどおりになる。">constrained decoding</span>）を自力で実装するのが核心です。「AIへのお願い（<span class="term" data-tip="AIに渡す指示やお願いの文章。この設計では正しさの保証には使わず、精度向上の補助と位置づける。">プロンプト</span>）で頑張って正しく書いてもらう」のではなく、<b>構造的に間違えられなくする</b>——これがこの課題の要求です。また、どの関数を呼ぶべきかの判断も<b>AI自身にさせます</b>（文字列の一致で決めるなどの小細工は禁止されています）。</p>
+<div class="callout"><b>やらないこと</b>: ボーナス課題（トークナイザの自作・生成過程の可視化・複数モデル対応など）は、必須部分が完了してから検討します。</div>
+</section>
+
+<!-- ==================== 2 ==================== -->
+<section id="sec-2">
+<h2>🗺 2. 全体の流れ</h2>
+<figure class="diagram">
+  <div class="d-flow">
+    <div class="d-step plain"><span class="d-num">入力</span>2つのJSONファイル<span class="d-cap">使える関数の説明書と、お願い文のリスト</span></div>
+    <div class="d-arr">→</div>
+    <div class="d-step"><span class="d-num">STEP 1</span>読み込む<span class="d-cap">形式をチェックしながら読み込む。壊れたファイルでも落ちない</span></div>
+    <div class="d-arr">→</div>
+    <div class="d-step"><span class="d-num">STEP 2</span>関数を選ぶ<span class="d-cap">AIに答えさせる。ただし選択肢は実在する関数名だけに制限</span></div>
+    <div class="d-arr">→</div>
+    <div class="d-step"><span class="d-num">STEP 3</span>引数を作る<span class="d-cap">選んだ関数の型に合わせ、1<span class="term" data-tip="AIが文章を読み書きするときの最小単位。単語より細かく区切られることが多く、1つの文字の途中で切れることさえある。">トークン</span>ずつ許可された候補だけから生成</span></div>
+    <div class="d-arr">→</div>
+    <div class="d-step"><span class="d-num">STEP 4</span>まとめて書き出す<span class="d-cap">全部の結果を1つのファイルにまとめる</span></div>
+    <div class="d-arr">→</div>
+    <div class="d-step plain"><span class="d-num">出力</span>結果のJSONファイル<span class="d-cap">必ず壊れていないJSONになっている</span></div>
+  </div>
+  <figcaption>プログラムの流れ。それぞれの STEP が担当の部品（クラス）になる</figcaption>
+</figure>
+<p>ポイントは、<b>STEP 2 も STEP 3 も、中身は同じ「制限つき生成」の仕組みで動く</b>ことです。選ばせる候補が「関数名の一覧」か「JSONとして正しい続き」かが違うだけです。</p>
+</section>
+
+<!-- ==================== 3 ==================== -->
+<section id="sec-3">
+<h2>🎯 3. ゴール（完成の条件）</h2>
+<p>次がすべて満たせたら「完成」と言えます。チェックはこのブラウザに保存されるので、進捗管理に使えます。</p>
+<div class="dod-head">
+  <span class="dod-count" id="dod-count">0 / 6</span>
+  <div class="dod-progress"><div class="dod-bar" id="dod-bar"></div></div>
+</div>
+<ul class="dod">
+  <li><input type="checkbox" id="dodc-1"><label for="dodc-1">インストールと実行が2つのコマンドだけで動く（<code>uv sync</code> → <code>uv run</code>。引数を省略したら既定のフォルダが使われる）</label></li>
+  <li><input type="checkbox" id="dodc-2"><label for="dodc-2">どの関数を呼ぶか・引数の中身の正解率が<b>90%以上</b></label></li>
+  <li><input type="checkbox" id="dodc-3"><label for="dodc-3">出力されるJSONは<b>100%壊れていない・型どおり</b>（AIへの「お願い」頼みの生成は使わない）</label></li>
+  <li><input type="checkbox" id="dodc-4"><label for="dodc-4">全部のお願い文の処理が<b>5分以内</b>に終わる</label></li>
+  <li><input type="checkbox" id="dodc-5"><label for="dodc-5">コードの自動チェック（<code>make lint</code>: 書式チェックと型チェック）がエラーなし</label></li>
+  <li><input type="checkbox" id="dodc-6"><label for="dodc-6">壊れた入力ファイルを渡されても、わかりやすいエラーを出してクラッシュしない</label></li>
+</ul>
+<div class="dod-note">チェック状態はこのブラウザ（localStorage）に保存されます。</div>
+</section>
+
+<!-- ==================== 4 ==================== -->
+<section id="sec-4">
+<h2>🧩 4. どう作る？</h2>
+<p>役割ごとに部品（クラス／ファイル）を分けます。登場人物は6人です。</p>
+<ul class="plain">
+  <li><b>受付係</b>（__main__.py）— コマンドの引数を受け取る</li>
+  <li><b>読み書き係</b>（io_utils.py + models.py）— ファイルの読み込み・チェック・書き出し。チェックには<span class="term" data-tip="データがスキーマ（型）どおりかを自動でチェックしてくれる Python のライブラリ。この課題で数少ない使用OKのライブラリの一つ。">pydantic</span> を使う</li>
+  <li><b>選択係</b>（selector.py）— どの関数を呼ぶかAIに選ばせる</li>
+  <li><b>生成係</b>（decoder.py）— 制限つきでJSONを1トークンずつ作る</li>
+  <li><b>辞書係</b>（vocab.py）— AIの<span class="term" data-tip="AIが知っている全トークンの一覧表。トークンの番号と文字の対応表になっている。">語彙</span>（トークンと文字の対応表）を管理する</li>
+  <li><b>進行係</b>（pipeline.py）— 全体の流れと時間を管理する</li>
+</ul>
+
+<p>作り方の中心になるアイデアは4つです。</p>
+
+<div class="idea">
+  <div class="i-title">アイデア1: 選択肢を絞って選ばせる</div>
+  AIは、次に出すトークンの全候補それぞれに点数（<span class="term" data-tip="AIが「次のトークン候補」の一つひとつに付ける点数。点数が高い候補ほど選ばれやすい。">logits</span>）を付けます。ルールに合わない候補の点数を最低にしてしまえば、その候補は絶対に選ばれません。あとは残りからいちばん点数の高いものを選ぶだけ（<span class="term" data-tip="毎回いちばん点数の高い候補を選ぶ決め方。結果が毎回同じになり、デバッグしやすい。">greedy</span>）。関数選びなら、点数を残すのは<b>「実在する関数名」だけ</b>。だから答えは必ず有効になります。
+</div>
+<div class="idea">
+  <div class="i-title">アイデア2: JSONの道案内役（状態機械）</div>
+  「今は数字を書く場面」「今は文字列の途中」のように現在の場面を管理する<span class="term" data-tip="「今どの場面にいるか」を覚えておき、場面ごとに「次にしてよいこと」を決める仕組み。信号機のように場面が順々に切り替わっていく。">状態機械</span>を作り、場面ごとに「書いてよい文字」を決めます。JSONの文法と、選んだ関数の型（<span class="term" data-tip="データの設計図。「このキーは数値」「このキーは文字列」のように、含むべき項目と型を決めたもの。">スキーマ</span>）の両方をこの場面に織り込むので、文法違反も型違反も起こせません。
+</div>
+<div class="idea">
+  <div class="i-title">アイデア3: 決まりきった部分はAIに書かせない</div>
+  キー名や記号（<code>{ } : , "</code>）は最初から決まっているので、AIに書かせず自動で埋めます。AIに生成させるのは「値」の部分だけ。速くて確実です。
+</div>
+<div class="idea">
+  <div class="i-title">アイデア4: 速さの工夫</div>
+  場面ごとの「許可トークン一覧」は起動時に一度だけ計算しておき、生成中は表引きだけで済ませます（5分制限への対策）。また、トークンが文字の途中で切れてしまう問題は、文字単位の前方一致で照合することで解決します。
+</div>
+
+<div class="callout"><b>ちなみに</b>: pytorch・transformers・outlines などの既製の便利ライブラリは<b>使用禁止</b>です。使えるのは numpy / json / pydantic と提供SDKだけ。だからこそ、この仕組みを自力で作ることに意味があります。</div>
+</section>
+
+<!-- ==================== 5 ==================== -->
+<section id="sec-5">
+<h2>✅ 5. どう確かめる？</h2>
+<ul class="plain">
+  <li><b>文法の道案内役を最初に固める</b> — 状態機械はAI抜きで単体テストできるので、いちばん先にテストを書いて固めます</li>
+  <li><b>全出力を機械チェック</b> — 出力ファイルを読み直して「100%壊れていないJSONか・型どおりか」をプログラムで確認します</li>
+  <li><b>意地悪テストをする</b> — 変な値（空文字・大きな数・小数・特殊文字）や曖昧なお願い文を食べさせて、それでも壊れないか確認します</li>
+  <li><b>壊れた入力ファイルを試す</b> — ファイル欠落・不正JSONを渡して、わかりやすいエラーメッセージが出るか確認します</li>
+  <li><b>時間を計る</b> — 全体の処理時間を計測して、5分以内に収まることを確認します</li>
+</ul>
+</section>
+
+<!-- ==================== 6 ==================== -->
+<section id="sec-6">
+<h2>🛠 6. 作る順番</h2>
+<ol class="steps">
+  <li><b>まず一番小さい形で通す</b> — 関数1つ・引数1個（数値だけ）のお願いが、最初から最後まで動く状態を作る</li>
+  <li><b>全部の型と関数選びに対応</b> — 文字列・真偽値などすべての型、AIによる関数選択、エラー処理をそろえ、精度と時間の目標をクリアする</li>
+  <li><b>余裕があれば挑戦</b> — トークナイザの自作や、生成過程の可視化に取り組む</li>
+</ol>
+</section>
+
+<!-- ==================== 7 ==================== -->
+<section id="sec-7">
+<h2>⚠️ 7. つまずきやすいポイント</h2>
+<ul class="plain">
+  <li><b>小さいAIなので賢さに限界がある</b> — 0.6Bという小型モデルは判断を間違えやすい。関数の説明の見せ方（プロンプト）を工夫して精度を稼ぎます。正しさそのものはガードレールが保証してくれるので、プロンプトはあくまで「精度向上の補助」という位置づけです</li>
+  <li><b>処理が5分を超える</b> — 許可リストの事前計算、決まりきった部分の一括埋め、プロンプトの短縮で対策します</li>
+  <li><b>トークンの途中切れの扱いでバグ</b> — いちばんバグが出やすい部分。AI抜きの単体テストを先に整備して、文法部分を固めてから組み込みます</li>
+</ul>
+</section>
+
+<!-- ==================== 8 ==================== -->
+<section id="sec-8">
+<h2>📖 8. 用語集</h2>
+<dl class="glossary">
+  <dt>LLM</dt><dd>大規模言語モデル。大量の文章から「次に来る言葉」を予測することを学んだAI。この課題では小型の Qwen3-0.6B を使う。</dd>
+  <dt>トークン</dt><dd>AIが文章を読み書きするときの最小単位。単語より細かく区切られることが多く、1つの文字の途中で切れることさえある。</dd>
+  <dt>logits</dt><dd>AIが「次のトークン候補」の一つひとつに付ける点数。点数が高い候補ほど選ばれやすい。</dd>
+  <dt>constrained decoding（制限つき生成）</dt><dd>ルールに合わないトークンを選べないようにしながらAIに文章を作らせる方法。お願いではなく仕組みで、出力が必ずルールどおりになる。</dd>
+  <dt>プロンプト</dt><dd>AIに渡す指示やお願いの文章。この設計では正しさの保証には使わず、精度向上の補助と位置づける。</dd>
+  <dt>JSON</dt><dd>波かっこ { } や引用符で書く、プログラム同士のデータ受け渡しの定番書式。書き方のルールが厳密に決まっている。</dd>
+  <dt>スキーマ</dt><dd>データの設計図。「このキーは数値」「このキーは文字列」のように、含むべき項目と型を決めたもの。</dd>
+  <dt>pydantic</dt><dd>データがスキーマ（型）どおりかを自動でチェックしてくれる Python のライブラリ。この課題で数少ない使用OKのライブラリの一つ。</dd>
+  <dt>状態機械</dt><dd>「今どの場面にいるか」を覚えておき、場面ごとに「次にしてよいこと」を決める仕組み。信号機のように場面が順々に切り替わっていく。</dd>
+  <dt>greedy（貪欲法）</dt><dd>毎回いちばん点数の高い候補を選ぶ決め方。結果が毎回同じになり、デバッグしやすい。</dd>
+  <dt>語彙（vocab）</dt><dd>AIが知っている全トークンの一覧表。トークンの番号と文字の対応表になっている。</dd>
+  <dt>CLI</dt><dd>ターミナルに文字でコマンドを打って動かすプログラムの形。マウスで操作する画面は持たない。</dd>
+</dl>
+</section>
+
+<footer>これは初学者向けに書き直した版です。要件ID・アルゴリズム詳細・テスト表を含む詳細版は、同じフォルダの <code>design.md</code> を参照してください。</footer>
+</main>
+</div>
+
+<div class="tip" id="tip" role="tooltip"></div>
+<script>
+(function(){
+  var KEY='call-me-maybe-design';
+
+  /* テーマ切替 */
+  var saved=localStorage.getItem(KEY+':theme');
+  if(saved){document.documentElement.dataset.theme=saved;}
+  document.getElementById('theme-toggle').addEventListener('click',function(){
+    var cur=document.documentElement.dataset.theme||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    var next=(cur==='dark')?'light':'dark';
+    document.documentElement.dataset.theme=next;
+    localStorage.setItem(KEY+':theme',next);
+  });
+
+  /* ゴールのチェックリスト（進捗保存） */
+  var boxes=Array.prototype.slice.call(document.querySelectorAll('ul.dod input[type=checkbox]'));
+  var state=[];
+  try{state=JSON.parse(localStorage.getItem(KEY+':dod')||'[]');}catch(e){}
+  boxes.forEach(function(b,i){
+    b.checked=!!state[i];
+    b.addEventListener('change',update);
+  });
+  function update(){
+    var s=boxes.map(function(b){return b.checked;});
+    localStorage.setItem(KEY+':dod',JSON.stringify(s));
+    var done=s.filter(Boolean).length;
+    document.getElementById('dod-count').textContent=done+' / '+boxes.length;
+    document.getElementById('dod-bar').style.width=(boxes.length?done/boxes.length*100:0)+'%';
+    boxes.forEach(function(b){b.closest('li').classList.toggle('done',b.checked);});
+  }
+  update();
+
+  /* 目次スクロール連動 */
+  var tocLinks=Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+  var byId={};
+  tocLinks.forEach(function(a){byId[a.getAttribute('href').slice(1)]=a;});
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        tocLinks.forEach(function(a){a.classList.remove('active');});
+        var a=byId[en.target.id];
+        if(a){a.classList.add('active');}
+      }
+    });
+  },{rootMargin:'-8% 0px -78% 0px'});
+  Array.prototype.slice.call(document.querySelectorAll('main section[id]')).forEach(function(t){obs.observe(t);});
+
+  /* 用語のホバー解説 */
+  var tip=document.getElementById('tip');
+  Array.prototype.slice.call(document.querySelectorAll('.term')).forEach(function(el){
+    el.addEventListener('mouseenter',function(){
+      if(!el.dataset.tip){return;}
+      tip.textContent=el.dataset.tip;
+      tip.style.display='block';
+      var r=el.getBoundingClientRect();
+      var left=Math.min(r.left,window.innerWidth-360);
+      tip.style.left=Math.max(8,left)+'px';
+      tip.style.top=(r.bottom+7+window.scrollY)+'px';
+    });
+    el.addEventListener('mouseleave',function(){tip.style.display='none';});
+  });
+})();
+</script>
+</body>
+</html>
