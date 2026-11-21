@@ -1,0 +1,78 @@
+[
+  {
+    "prompt": "What is 6 times 7?",
+    "name": "fn_multiply_numbers",
+    "parameters": {
+      "a": 6.0,
+      "b": 7.0
+    }
+  },
+  {
+    "prompt": "Multiply 2.5 by 4",
+    "name": "fn_multiply_numbers",
+    "parameters": {
+      "a": 2.5,
+      "b": 4.0
+    }
+  },
+  {
+    "prompt": "Repeat 'ha' 3 times",
+    "name": "fn_repeat_string",
+    "parameters": {
+      "s": "ha",
+      "times": 3
+    }
+  },
+  {
+    "prompt": "Repeat the word 'echo' 5 times",
+    "name": "fn_repeat_string",
+    "parameters": {
+      "s": "echo",
+      "times": 5
+    }
+  },
+  {
+    "prompt": "Is 10 an even number?",
+    "name": "fn_is_even",
+    "parameters": {
+      "n": 10
+    }
+  },
+  {
+    "prompt": "Check if 7 is even",
+    "name": "fn_is_even",
+    "parameters": {
+      "n": 7
+    }
+  },
+  {
+    "prompt": "Convert 100 degrees Celsius to Fahrenheit",
+    "name": "fn_convert_temperature",
+    "parameters": {
+      "value": 100.0,
+      "to_fahrenheit": true
+    }
+  },
+  {
+    "prompt": "Convert 212 degrees Fahrenheit to Celsius",
+    "name": "fn_convert_temperature",
+    "parameters": {
+      "value": 212.0,
+      "to_fahrenheit": true
+    }
+  },
+  {
+    "prompt": "How many words are in 'the quick brown fox'?",
+    "name": "fn_count_words",
+    "parameters": {
+      "sentence": "the quick brown fox"
+    }
+  },
+  {
+    "prompt": "Count the words in 'I love programming in Python'",
+    "name": "fn_count_words",
+    "parameters": {
+      "sentence": "I love programming in Python"
+    }
+  }
+]

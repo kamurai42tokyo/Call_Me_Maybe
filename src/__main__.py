@@ -51,18 +51,28 @@ def main(argv: list[str]) -> int:
     # parse_args(argv[1:])      : 実際のコマンドライン引数を読んで、各パスを args にまとめる
     parser = argparse.ArgumentParser()
     parser.add_argument("--functions_definition",
+                        dest="functions_definition_path",
                         default="data/input/functions_definition.json")
     parser.add_argument("--input",
+                        dest="prompt_path",
                         default="data/input/function_calling_tests.json")
     parser.add_argument("--output",
+                        dest="output_path",
                         default="data/output/function_calling_results.json")
     args: argparse.Namespace = parser.parse_args(argv[1:])
 
     # args を引数として Pipeline に渡して実行する。
     try:
-        Pipeline(args.functions_definition, args.input, args.output).run()
+        Pipeline(
+            args.functions_definition_path,
+            args.prompt_path,
+            args.output_path
+        ).run()
     except CallMeMaybeError as e:
-        print(e)
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
+    except Exception as e:
+        print(f"Unexpected error: {e}", file=sys.stderr)
         return 1
     return 0
 

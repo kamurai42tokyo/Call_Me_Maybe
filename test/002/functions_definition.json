@@ -1,0 +1,71 @@
+[
+  {
+    "name": "fn_multiply_numbers",
+    "description": "Multiply two numbers and return the product.",
+    "parameters": {
+      "a": {
+        "type": "number"
+      },
+      "b": {
+        "type": "number"
+      }
+    },
+    "returns": {
+      "type": "number"
+    }
+  },
+  {
+    "name": "fn_repeat_string",
+    "description": "Repeat a string a given number of times.",
+    "parameters": {
+      "s": {
+        "type": "string"
+      },
+      "times": {
+        "type": "integer"
+      }
+    },
+    "returns": {
+      "type": "string"
+    }
+  },
+  {
+    "name": "fn_is_even",
+    "description": "Check whether an integer is even.",
+    "parameters": {
+      "n": {
+        "type": "integer"
+      }
+    },
+    "returns": {
+      "type": "boolean"
+    }
+  },
+  {
+    "name": "fn_convert_temperature",
+    "description": "Convert a temperature between Celsius and Fahrenheit. Set to_fahrenheit to true to convert from Celsius to Fahrenheit, or false to convert from Fahrenheit to Celsius.",
+    "parameters": {
+      "value": {
+        "type": "number"
+      },
+      "to_fahrenheit": {
+        "type": "boolean"
+      }
+    },
+    "returns": {
+      "type": "number"
+    }
+  },
+  {
+    "name": "fn_count_words",
+    "description": "Count the number of words in a sentence.",
+    "parameters": {
+      "sentence": {
+        "type": "string"
+      }
+    },
+    "returns": {
+      "type": "integer"
+    }
+  }
+]

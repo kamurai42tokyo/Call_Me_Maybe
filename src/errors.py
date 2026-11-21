@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 
-"""本プログラムにおけるエラーの種類（入力・出力・モデル・生成）を定義する
+"""本プログラムで使う例外の種類を定義する。
+
+CallMeMaybeError を基底とし、入力（InputFileError）・出力（OutputFileError）・
+モデル（ModelError）の 3 種類に分ける。
 """
+
 
 class CallMeMaybeError(Exception):
     """本プログラムの全例外の基底。"""
     ...
+
 
 class InputFileError(CallMeMaybeError):
     """入力に関するエラー。
@@ -15,6 +20,7 @@ class InputFileError(CallMeMaybeError):
     """
     ...
 
+
 class OutputFileError(CallMeMaybeError):
     """出力に関するエラー。
 
@@ -22,18 +28,11 @@ class OutputFileError(CallMeMaybeError):
     """
     ...
 
+
 class ModelError(CallMeMaybeError):
     """LLM に関するエラー。
 
     - llm_sdk が読み込む LLM（Qwen/Qwen3-0.6B）の読み込みに失敗した。
     - llm_sdk が返す語彙ファイル（vocab.json）の読み込みに失敗した。
-    """
-    ...
-
-class DecodingError(CallMeMaybeError):
-    """デコーディングに関するエラー。
-
-    - 生成中に許可トークンが 1 つもなくなった。
-    - 引数の値が最後まで完成しなかった。
     """
     ...

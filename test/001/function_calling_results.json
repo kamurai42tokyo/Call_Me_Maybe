@@ -1,0 +1,78 @@
+[
+  {
+    "prompt": "Add 7 and 15",
+    "name": "fn_add_numbers",
+    "parameters": {
+      "a": 7.0,
+      "b": 15.0
+    }
+  },
+  {
+    "prompt": "Can you add 1200 and 34 for me?",
+    "name": "fn_add_numbers",
+    "parameters": {
+      "a": 1200.0,
+      "b": 34.0
+    }
+  },
+  {
+    "prompt": "Say hello to Alice",
+    "name": "fn_greet",
+    "parameters": {
+      "name": "Alice"
+    }
+  },
+  {
+    "prompt": "Please greet Bob",
+    "name": "fn_greet",
+    "parameters": {
+      "name": "Bob"
+    }
+  },
+  {
+    "prompt": "Write 'python' backwards",
+    "name": "fn_reverse_string",
+    "parameters": {
+      "s": "python"
+    }
+  },
+  {
+    "prompt": "What is 'stressed' reversed?",
+    "name": "fn_reverse_string",
+    "parameters": {
+      "s": "stressed"
+    }
+  },
+  {
+    "prompt": "Find the square root of 81",
+    "name": "fn_get_square_root",
+    "parameters": {
+      "a": 81.0
+    }
+  },
+  {
+    "prompt": "What number multiplied by itself gives 49?",
+    "name": "fn_get_square_root",
+    "parameters": {
+      "a": 49.0
+    }
+  },
+  {
+    "prompt": "Replace every space in 'one two three' with a dash",
+    "name": "fn_substitute_string_with_regex",
+    "parameters": {
+      "source_string": "one two three",
+      "regex": " \\s+",
+      "replacement": "--"
+    }
+  },
+  {
+    "prompt": "Change all 'a' characters to 'o' in 'banana'",
+    "name": "fn_substitute_string_with_regex",
+    "parameters": {
+      "source_string": "banana",
+      "regex": "a",
+      "replacement": "o"
+    }
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "prompt": "Add 7 and 15"
+  },
+  {
+    "prompt": "Can you add 1200 and 34 for me?"
+  },
+  {
+    "prompt": "Say hello to Alice"
+  },
+  {
+    "prompt": "Please greet Bob"
+  },
+  {
+    "prompt": "Write 'python' backwards"
+  },
+  {
+    "prompt": "What is 'stressed' reversed?"
+  },
+  {
+    "prompt": "Find the square root of 81"
+  },
+  {
+    "prompt": "What number multiplied by itself gives 49?"
+  },
+  {
+    "prompt": "Replace every space in 'one two three' with a dash"
+  },
+  {
+    "prompt": "Change all 'a' characters to 'o' in 'banana'"
+  }
+]

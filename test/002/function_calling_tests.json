@@ -1,0 +1,32 @@
+[
+  {
+    "prompt": "What is 6 times 7?"
+  },
+  {
+    "prompt": "Multiply 2.5 by 4"
+  },
+  {
+    "prompt": "Repeat 'ha' 3 times"
+  },
+  {
+    "prompt": "Repeat the word 'echo' 5 times"
+  },
+  {
+    "prompt": "Is 10 an even number?"
+  },
+  {
+    "prompt": "Check if 7 is even"
+  },
+  {
+    "prompt": "Convert 100 degrees Celsius to Fahrenheit"
+  },
+  {
+    "prompt": "Convert 212 degrees Fahrenheit to Celsius"
+  },
+  {
+    "prompt": "How many words are in 'the quick brown fox'?"
+  },
+  {
+    "prompt": "Count the words in 'I love programming in Python'"
+  }
+]
